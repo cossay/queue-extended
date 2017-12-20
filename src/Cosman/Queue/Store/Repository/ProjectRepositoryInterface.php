@@ -50,6 +50,15 @@ interface ProjectRepositoryInterface extends RepositoryInterface
      * @return \Cosman\Queue\Store\Model\Project|NULL
      */
     public function fetchByCode(string $code, Client $client = null): ?Project;
+    
+    /**
+     * Fetches a single project by name
+     *
+     * @param string $name
+     * @param Client $client
+     * @return \Cosman\Queue\Store\Model\Project|NULL
+     */
+    public function fetchByName(string $name, Client $client = null): ?Project;
 
     /**
      * Creates a single project

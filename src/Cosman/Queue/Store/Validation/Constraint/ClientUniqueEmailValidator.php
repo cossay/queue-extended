@@ -18,6 +18,15 @@ class ClientUniqueEmailValidator extends ConstraintValidator
 
     /**
      *
+     * @param ClientRepositoryInterface $repository
+     */
+    public function __construct(ClientRepositoryInterface $repository)
+    {
+        $this->repository = $repository;
+    }
+
+    /**
+     *
      * {@inheritdoc}
      * @see \Symfony\Component\Validator\ConstraintValidatorInterface::validate()
      */
@@ -38,15 +47,5 @@ class ClientUniqueEmailValidator extends ConstraintValidator
         }
         
         $this->context->addViolation($constraint->message);
-    }
-
-    /**
-     * Sets repository for validating client email address
-     *
-     * @param ClientRepositoryInterface $repository
-     */
-    public function setRepository(ClientRepositoryInterface $repository)
-    {
-        $this->repository = $repository;
     }
 }

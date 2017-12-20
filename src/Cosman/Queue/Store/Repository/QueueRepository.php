@@ -111,6 +111,21 @@ class QueueRepository extends BaseRepository implements QueueRepositoryInterface
     /**
      *
      * {@inheritdoc}
+     * @see \Cosman\Queue\Store\Repository\QueueRepositoryInterface::fetchByName()
+     */
+    public function fetchByName(string $name, Client $client = null, Project $project = null): ?Queue
+    {
+        $model = $this->withJoins([], $client, $project)
+            ->where(QueueTable::FIELD_NAME, '=', $name)
+            ->limit(1)
+            ->first();
+        
+        return $this->format($model);
+    }
+
+    /**
+     *
+     * {@inheritdoc}
      * @see \Cosman\Queue\Store\Repository\QueueRepositoryInterface::create()
      */
     public function create(Queue $queue): int

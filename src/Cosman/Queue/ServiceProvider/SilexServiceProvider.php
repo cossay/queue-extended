@@ -29,6 +29,8 @@ use Cosman\Queue\Store\Repository\QueueRepository;
 use Cosman\Queue\Store\Validation\QueueValidator;
 use Cosman\Queue\Http\Converter\QueueConverter;
 use Cosman\Queue\Http\Controller\QueueController;
+use Cosman\Queue\Store\Validation\Constraint\ProjectUniqueNameValidator;
+use Cosman\Queue\Store\Validation\Constraint\QueueUniqueNameValidator;
 
 /**
  * Silex integration service provider
@@ -81,15 +83,22 @@ class SilexServiceProvider implements ServiceProviderInterface, ControllerProvid
         
         // VALIDATION CONSTRAINTS'
         $container['cosman.queue.validator.constraint.client.email.unique'] = function (Container $container) {
-            $constraint = new ClientUniqueEmailValidator();
-            $constraint->setRepository($container['cosman.queue.repo.client']);
-            
-            return $constraint;
+            return new ClientUniqueEmailValidator($container['cosman.queue.repo.client']);
+        };
+        
+        $container['cosman.queue.validator.constraint.project.name.unique'] = function (Container $container) {
+            return new ProjectUniqueNameValidator($container['cosman.queue.repo.project']);
+        };
+        
+        $container['cosman.queue.validator.constraint.queue.name.unique'] = function (Container $container) {
+            return new QueueUniqueNameValidator($container['cosman.queue.repo.queue']);
         };
         
         $container['validator.validator_service_ids'] = function () {
             return array(
-                'cosman.queue.validator.constraint.client.email.unique' => 'cosman.queue.validator.constraint.client.email.unique'
+                'cosman.queue.validator.constraint.client.email.unique' => 'cosman.queue.validator.constraint.client.email.unique',
+                'cosman.queue.validator.constraint.project.name.unique' => 'cosman.queue.validator.constraint.project.name.unique',
+                'cosman.queue.validator.constraint.queue.name.unique' => 'cosman.queue.validator.constraint.queue.name.unique'
             );
         };
         

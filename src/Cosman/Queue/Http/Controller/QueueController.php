@@ -74,7 +74,7 @@ class QueueController extends Controller
                 'headers' => $this->request->request->get('headers', [])
             );
             
-            if (! $this->validator->validate($attributes)) {
+            if (! $this->validator->validate($attributes, $client, $project)) {
                 return $this->response->error($this->validator->getErrors(), Response::HTTP_UNPROCESSABLE_ENTITY, $this->validator->getFirstError());
             }
             
@@ -124,7 +124,7 @@ class QueueController extends Controller
                 'headers' => $this->request->request->get('headers', $queue->getHeaders())
             );
             
-            if (! $this->validator->validate($attributes)) {
+            if (! $this->validator->validate($attributes, $client, $project, $queue->getId())) {
                 return $this->response->error($this->validator->getErrors(), Response::HTTP_UNPROCESSABLE_ENTITY, $this->validator->getFirstError());
             }
             

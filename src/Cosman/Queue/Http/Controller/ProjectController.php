@@ -63,7 +63,7 @@ class ProjectController extends Controller
                 'description' => $this->request->request->get('description')
             );
             
-            if (! $this->validator->validate($attributes)) {
+            if (! $this->validator->validate($attributes, $client)) {
                 return $this->response->error($this->validator->getErrors(), Response::HTTP_UNPROCESSABLE_ENTITY, $this->validator->getFirstError());
             }
             
@@ -86,23 +86,23 @@ class ProjectController extends Controller
      * @param Project $project
      * @return \Cosman\Queue\Http\Response\Response
      */
-    public function putProject(Project $project): Response
+    public function putProjects(Project $project): Response
     {
         try {
             
             $client = $this->accessManager->getClient($this->request);
             
-            if (!$client->ownsProject($project)) {
+            if (! $client->ownsProject($project)) {
                 return $this->response->error(null, Response::HTTP_FORBIDDEN, static::MESSAGE_ACCESS_FORBIDDEN);
             }
             
-            //Use existing project attributes as default so that clients provide only properties they wish to update
+            // Use existing project attributes as default so that clients provide only properties they wish to update
             $attributes = array(
                 'name' => $this->request->request->get('name', $project->getName()),
                 'description' => $this->request->request->get('description', $project->getDescription())
             );
             
-            if (! $this->validator->validate($attributes)) {
+            if (! $this->validator->validate($attributes, $client, $project->getId())) {
                 return $this->response->error($this->validator->getErrors(), Response::HTTP_UNPROCESSABLE_ENTITY, $this->validator->getFirstError());
             }
             
@@ -155,7 +155,7 @@ class ProjectController extends Controller
         try {
             $client = $this->accessManager->getClient($this->request);
             
-            if (!$client->ownsProject($project)) {
+            if (! $client->ownsProject($project)) {
                 return $this->response->error(null, Response::HTTP_FORBIDDEN, static::MESSAGE_ACCESS_FORBIDDEN);
             }
             
@@ -176,7 +176,7 @@ class ProjectController extends Controller
         try {
             $client = $this->accessManager->getClient($this->request);
             
-            if (!$client->ownsProject($project)) {
+            if (! $client->ownsProject($project)) {
                 return $this->response->error(null, Response::HTTP_FORBIDDEN, static::MESSAGE_ACCESS_FORBIDDEN);
             }
             

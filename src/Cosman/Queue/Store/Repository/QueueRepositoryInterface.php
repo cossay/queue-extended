@@ -56,6 +56,16 @@ interface QueueRepositoryInterface extends RepositoryInterface
      * @return \Cosman\Queue\Store\Model\Queue|NULL
      */
     public function fetchByCode(string $code, Client $client = null, Project $project = null): ?Queue;
+    
+    /**
+     * Fetches a single queue by its name
+     *
+     * @param string $name
+     * @param Client $client
+     * @param Project $project
+     * @return \Cosman\Queue\Store\Model\Queue|NULL
+     */
+    public function fetchByName(string $name, Client $client = null, Project $project = null): ?Queue;
 
     /**
      * Creates a single queue

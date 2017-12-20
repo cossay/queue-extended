@@ -6,6 +6,9 @@ use Cosman\Queue\Store\Model\Job;
 use Cosman\Queue\Store\Validation\Constraint\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\HttpFoundation\Request;
+use Cosman\Queue\Store\Model\Client;
+use Cosman\Queue\Store\Model\Project;
+use Cosman\Queue\Store\Validation\Constraint\QueueUniqueName;
 
 /**
  *
@@ -20,7 +23,7 @@ class QueueValidator extends BaseValidator
      * {@inheritdoc}
      * @see \Cosman\Queue\Store\Validation\BaseValidator::getDefinedConstraints()
      */
-    protected function getDefinedConstraints(array $data = []): Collection
+    protected function getDefinedConstraints(array $data = [], Client $client = null, Project $project = null, int $queueId = null): Collection
     {
         $options = [];
         
@@ -35,6 +38,12 @@ class QueueValidator extends BaseValidator
             new Assert\Length(array(
                 'max' => 255,
                 'maxMessage' => 'Queue name must not be longer than {{ limit }} characters.'
+            )),
+            new QueueUniqueName(array(
+                'id' => $queueId,
+                'client' => $client,
+                'project' => $project,
+                'message' => 'A queue with the given name already exists in the specified project.'
             ))
         );
         
@@ -120,5 +129,27 @@ class QueueValidator extends BaseValidator
         );
         
         return new Collection($options);
+    }
+
+    /**
+     *
+     * {@inheritdoc}
+     * @see \Cosman\Queue\Store\Validation\BaseValidator::validate()
+     */
+    public function validate(array $model, Client $client = null, Project $project = null, int $queueId = null): bool
+    {
+        if (! $client) {
+            throw new \Exception(sprintf('Argument 2 passed to %s must an instanceof %s null given.', __METHOD__, Client::class));
+        }
+        
+        if (! $project) {
+            throw new \Exception(sprintf('Argument 3 passed to %s must an instanceof %s null given.', __METHOD__, Project::class));
+        }
+        
+        $violations = $this->validator->validate($model, $this->getDefinedConstraints($model, $client, $project, $queueId));
+        
+        $this->errors = $this->formatErrors($violations);
+        
+        return 0 === count($this->errors);
     }
 }

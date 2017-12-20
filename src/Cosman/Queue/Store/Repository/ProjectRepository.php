@@ -99,6 +99,20 @@ class ProjectRepository extends BaseRepository implements ProjectRepositoryInter
     /**
      *
      * {@inheritdoc}
+     * @see \Cosman\Queue\Store\Repository\ProjectRepositoryInterface::fetchByName()
+     */
+    public function fetchByName(string $name, Client $client = null): ?Project
+    {
+        $query = $this->withJoins([], $client)
+            ->where(ProjectTable::FIELD_NAME, '=', $name)
+            ->limit(1);
+        
+        return $this->format($query->first());
+    }
+
+    /**
+     *
+     * {@inheritdoc}
      * @see \Cosman\Queue\Store\Repository\ProjectRepositoryInterface::create()
      */
     public function create(Project $project): int

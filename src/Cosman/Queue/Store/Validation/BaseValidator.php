@@ -4,6 +4,7 @@ namespace Cosman\Queue\Store\Validation;
 
 use Cosman\Queue\Store\Validation\Constraint\Collection;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * Base validator class
@@ -45,14 +46,13 @@ abstract class BaseValidator
     abstract protected function getDefinedConstraints(array $data = []): Collection;
 
     /**
-     * Validates a given array against a constraint
      *
-     * @param array $model
-     * @return bool
+     * @param ConstraintViolationListInterface $violations
+     * @return string[][]
      */
-    public function validate(array $model): bool
+    protected function formatErrors(ConstraintViolationListInterface $violations): array
     {
-        $violations = $this->validator->validate($model, $this->getDefinedConstraints($model));
+        $errors = [];
         
         foreach ($violations as $violation) {
             
@@ -63,10 +63,25 @@ abstract class BaseValidator
             
             $field = str_replace($search, '', $violation->getPropertyPath());
             
-            if (! array_key_exists($field, $this->errors)) {
-                $this->errors[$field] = $violation->getMessage();
+            if (! array_key_exists($field, $errors)) {
+                $errors[$field] = $violation->getMessage();
             }
         }
+        
+        return $errors;
+    }
+
+    /**
+     * Validates a given array against a constraint
+     *
+     * @param array $model
+     * @return bool
+     */
+    public function validate(array $model): bool
+    {
+        $violations = $this->validator->validate($model, $this->getDefinedConstraints($model));
+        
+        $this->errors = $this->formatErrors($violations);
         
         return 0 === count($this->errors);
     }
